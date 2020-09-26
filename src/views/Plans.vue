@@ -13,40 +13,50 @@
       </div>
     </header-component>
     <div class="content">
+      <loading
+        :active.sync="isLoading"
+        :can-cancel="false"
+        :is-full-page="true"
+      ></loading>
       <ul class="top-nav">
-        <li class="active">User License</li>
-        <li>Test Center</li>
-        <li>Smart Paper</li>
-        <li>Observer</li>
-        <li>Teachers and Instructors</li>
+        <li
+          v-for="productType in productTypes"
+          :key="productType.ID"
+          :class="{ active: currentType === productType.ID }"
+          @click="changeType(productType.ID)"
+        >
+          {{ productType.Product_Type }}
+        </li>
       </ul>
-      <div class="switches">
-        <div class="switch-container">
-          <switch-component
-            :options="[
-              { label: 'EGP', value: 'E£' },
-              { label: 'USD', value: '$' }
-            ]"
-          ></switch-component>
-        </div>
-        <div class="switch-container">
-          <switch-component
-            :options="[
-              { label: 'Monthly', value: 'm' },
-              { label: 'Yearly', value: 'y' }
-            ]"
-          ></switch-component>
-        </div>
-      </div>
+      <!--      <div class="switches">-->
+      <!--        <div class="switch-container">-->
+      <!--          <switch-component-->
+      <!--            :options="[-->
+      <!--              { label: 'EGP', value: 'E£' },-->
+      <!--              { label: 'USD', value: '$' }-->
+      <!--            ]"-->
+      <!--          ></switch-component>-->
+      <!--        </div>-->
+      <!--        <div class="switch-container">-->
+      <!--          <switch-component-->
+      <!--            :options="[-->
+      <!--              { label: 'Monthly', value: 'm' },-->
+      <!--              { label: 'Yearly', value: 'y' }-->
+      <!--            ]"-->
+      <!--          ></switch-component>-->
+      <!--        </div>-->
+      <!--      </div>-->
       <div class="hosting-plans">
         <pricing-card
-          v-for="hosting in hostings"
-          :key="hosting.type"
-          :hosting="hosting"
+          v-for="currentPlan in currentPlans"
+          :key="currentPlan.ID"
+          :plan="currentPlan"
         ></pricing-card>
       </div>
       <div>
-        <a href=""><h1 class="see-all">See Full Comparison</h1></a>
+        <router-link :to="{ name: 'All', query: { type: currentType } }"
+          ><h1 class="see-all">See Full Comparison</h1></router-link
+        >
       </div>
     </div>
   </div>
@@ -56,66 +66,60 @@
 // @ is an alias to /src
 import HeaderComponent from "../components/main/HeaderComponent";
 import PricingCard from "../components/main/PricingCard";
-import SwitchComponent from "../components/main/SwitchComponent";
+// import SwitchComponent from "../components/main/SwitchComponent";
+import { productPlans, productTypes } from "../api/Product";
+// Import component
+import Loading from "vue-loading-overlay";
+// Import stylesheet
+import "vue-loading-overlay/dist/vue-loading.css";
+
 export default {
-  name: "Home",
+  name: "Plans",
   components: {
     HeaderComponent,
     PricingCard,
-    SwitchComponent
+    // SwitchComponent,
+    Loading
   },
   data() {
     return {
+      isLoading: false,
       title: "Plans and Pricing",
       description: "Plans built for every organization and institution",
       img: "",
-      hostings: [
-        {
-          title: "Professional",
-          description: "Contrary to popular belief, Lorem",
-          img: "plan1.png",
-          default: false,
-          features: [
-            "Basic Curriculum Management",
-            "Basic Questions Bank",
-            "Test Authoring",
-            "Test Delivery",
-            "Assignments & Projects",
-            "Basic Analytics"
-          ]
-        },
-        {
-          title: "Professional",
-          description: "Contrary to popular belief, Lorem",
-          img: "plan2.png",
-          default: true,
-          features: [
-            "Basic Curriculum Management",
-            "Basic Questions Bank",
-            "Test Authoring",
-            "Test Delivery",
-            "Assignments & Projects",
-            "Basic Analytics",
-            "Accessibility",
-            "Cloud Hosting Only"
-          ]
-        },
-        {
-          title: "Professional",
-          description: "Contrary to popular belief, Lorem",
-          img: "plan3.png",
-          default: false,
-          features: [
-            "Basic Curriculum Management",
-            "Basic Questions Bank",
-            "Test Authoring",
-            "Test Delivery",
-            "Assignments & Projects",
-            "Basic Analytics"
-          ]
-        }
-      ]
+      productTypes: [],
+      productPlans: [],
+      hostings: [],
+      currentType: "",
+      currentPlans: []
     };
+  },
+  mounted() {
+    this.fetchData();
+  },
+  methods: {
+    async fetchData() {
+      this.isLoading = true;
+      this.productTypes = await productTypes.get();
+      if (this.productTypes.length >= 1) {
+        this.currentType = this.productTypes[0].ID;
+        this.currentPlans = this.productPlans[this.productTypes[0].ID];
+      }
+      let plans = await productPlans.get();
+      plans.forEach(plan => {
+        if (!this.productPlans[plan.Product_Type.ID])
+          this.productPlans[plan.Product_Type.ID] = [];
+        this.productPlans[plan.Product_Type.ID].push(plan);
+      });
+      if (this.productTypes.length >= 1) {
+        this.currentPlans = this.productPlans[this.productTypes[0].ID];
+      }
+      this.isLoading = false;
+    },
+    changeType(type) {
+      this.currentType = type;
+      this.currentPlans = this.productPlans[type];
+    }
   }
 };
 </script>
@@ -153,6 +157,7 @@ ul.top-nav {
     font-weight: $semibold_weight;
     font-size: 20px;
     margin: 20px 30px;
+    cursor: pointer;
     &:hover,
     &.active {
       color: $secondary2_color;

@@ -5,7 +5,10 @@
       :description="description"
       :img="img"
     ></header-component>
-    <table-component></table-component>
+    <table-component
+      title="Support Packages"
+      :enable-parent="false"
+    ></table-component>
   </div>
 </template>
 
@@ -14,17 +17,17 @@
 import HeaderComponent from "../components/main/HeaderComponent";
 import TableComponent from "../components/main/TableComponent";
 export default {
-  name: "Home",
+  name: "Packages",
   components: {
     HeaderComponent,
     TableComponent
   },
   data() {
     return {
-      title: "Main User License Plans",
+      title: "Customize the plan exactly on your needs",
       description:
-        "Explore our user licenses plans for SwiftAssess, which includes a variety of features to help you achieve more",
-      img: "header-img1.png"
+        "Please fill in the next fields to ensure you the best plan for you",
+      img: ""
     };
   }
 };

@@ -1,17 +1,24 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
-import Home from "../views/Home.vue";
+import All from "../views/All.vue";
 import Hosting from "../views/Hosting.vue";
 import Plans from "../views/Plans";
 import Form from "../views/Form";
+import Packages from "../views/Packages";
+import Services from "../views/Services";
 
 Vue.use(VueRouter);
 
 const routes = [
   {
     path: "/",
-    name: "Home",
-    component: Home
+    name: "Plans",
+    component: Plans
+  },
+  {
+    path: "/all",
+    name: "All",
+    component: All
   },
   {
     path: "/hosting",
@@ -19,14 +26,19 @@ const routes = [
     component: Hosting
   },
   {
-    path: "/plans",
-    name: "Plans",
-    component: Plans
-  },
-  {
     path: "/form",
     name: "Form",
     component: Form
+  },
+  {
+    path: "/services",
+    name: "Services",
+    component: Services
+  },
+  {
+    path: "/packages",
+    name: "Packages",
+    component: Packages
   }
   // {
   //   path: "/about",

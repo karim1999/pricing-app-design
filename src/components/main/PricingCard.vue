@@ -2,32 +2,39 @@
   <div class="pricing-card">
     <div class="card">
       <img
-        v-if="hosting.default"
+        v-if="plan.Is_Most_Popular === 'Yes'"
         class="default-img"
         src="../../assets/default.png"
         alt=""
       />
-      <h1 class="title">{{ hosting.title }}</h1>
-      <h2 v-if="hosting.description" class="description">
-        {{ hosting.description }}
-      </h2>
-      <img :src="getImgUrl(hosting.img)" alt="" />
-      <p class="price">
-        <span class="price-num"
-          ><span class="currency">$</span>256<span class="year">/yr</span></span
-        >
-      </p>
-      <h2 class="description">
-        Annual Plan Per Person
-      </h2>
+      <h1 class="title">{{ plan.Feature_Plan }}</h1>
+      <h2
+        v-if="plan.Description"
+        v-html="plan.Description"
+        class="description"
+      ></h2>
+      <!--      <img :src="getImgUrl(plan.img)" alt="" />-->
+      <!--      <p class="price">-->
+      <!--        <span class="price-num"-->
+      <!--          ><span class="currency">$</span>256<span class="year">/yr</span></span-->
+      <!--        >-->
+      <!--      </p>-->
+      <!--      <h2 class="description">-->
+      <!--        Annual Plan Per Person-->
+      <!--      </h2>-->
       <ul>
-        <li v-for="feature in hosting.features" :key="feature">
+        <li v-for="feature in plan.Plan_Features" :key="feature.ID">
           <img src="../../assets/feature-icon.png" alt="" />
-          {{ feature }}
+          {{ feature.display_value }}
         </li>
       </ul>
     </div>
-    <div :class="{ 'btn-container': true, default: hosting.default }">
+    <div
+      :class="{
+        'btn-container': true,
+        default: plan.Is_Most_Popular === 'Yes'
+      }"
+    >
       <button>Request a Quote</button>
     </div>
   </div>
@@ -36,7 +43,7 @@
 <script>
 export default {
   name: "PricingCard",
-  props: ["hosting"],
+  props: ["plan"],
   methods: {
     getImgUrl(img) {
       return require("@/assets/" + img);

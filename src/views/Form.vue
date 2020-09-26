@@ -93,7 +93,7 @@
 // @ is an alias to /src
 import HeaderComponent from "../components/main/HeaderComponent";
 export default {
-  name: "Home",
+  name: "Form",
   components: {
     HeaderComponent
   },

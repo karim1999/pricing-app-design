@@ -1,37 +1,60 @@
 <template>
-  <div class="table-container">
+  <div class="container">
     <loading
       :active.sync="isLoading"
       :can-cancel="false"
-      :is-full-page="false"
+      :is-full-page="true"
     ></loading>
-    <div class="row">
-      <h1>{{ title }}</h1>
-      <div class="plans-container">
-        <div class="plan" v-for="index in 4" :key="index">
-          <p class="title">Basic</p>
-          <!--          <p class="price">-->
-          <!--            <span class="price-num"><span class="currency">$</span> 256</span>-->
-          <!--          </p>-->
-          <!--          <p class="duration">Per Month</p>-->
-          <button class="subscribe-btn">Select This Plan</button>
-        </div>
-      </div>
-    </div>
-    <div class="table" v-for="index in 5" :key="index">
-      <div v-if="enableParent" class="parent-feature">
-        <img src="../../assets/group-icon.png" alt="" />
-        <h1>Curriculum Management</h1>
-      </div>
-      <div class="row feature-container" v-for="feature in 5" :key="feature">
-        <div class="feature-name">
-          <img src="../../assets/feature-icon.png" alt="" />
-          <h2>Outcomes Module</h2>
-        </div>
+    <header-component
+      :title="title"
+      :description="description"
+      :img="img"
+    ></header-component>
+    <div class="table-container">
+      <div class="row">
+        <h1>Plans/ Features</h1>
         <div class="plans-container">
-          <div class="feature-plan-value" v-for="index in 4" :key="index">
-            <p v-if="(index + feature) % 2 == 0" class="value">Basic</p>
-            <img v-else class="check" src="../../assets/check.png" alt="" />
+          <div class="plan" v-for="plan in plans" :key="plan.ID">
+            <p class="title">{{ plan.Feature_Plan }}</p>
+            <!--          <p class="price">-->
+            <!--            <span class="price-num"><span class="currency">$</span> 256</span>-->
+            <!--          </p>-->
+            <!--          <p class="duration">Per Month</p>-->
+            <button class="subscribe-btn">Select This Plan</button>
+          </div>
+        </div>
+      </div>
+      <div class="table">
+        <!--        <div v-if="enableParent" class="parent-feature">-->
+        <!--          <img src="../assets/group-icon.png" alt="" />-->
+        <!--          <h1>Curriculum Management</h1>-->
+        <!--        </div>-->
+        <div
+          class="row feature-container"
+          v-for="feature in features"
+          :key="feature.ID"
+        >
+          <div class="feature-name">
+            <img src="../assets/feature-icon.png" alt="" />
+            <h2>{{ feature.Product_Plan_Feature }}</h2>
+          </div>
+          <div class="plans-container">
+            <div
+              class="feature-plan-value"
+              v-for="plan in plans"
+              :key="plan.ID"
+            >
+              <img
+                v-if="
+                  plan.Plan_Features &&
+                    plan.Plan_Features.filter(feat => feat.ID === feature.ID)
+                      .length >= 1
+                "
+                class="check"
+                src="../assets/check.png"
+                alt=""
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -40,23 +63,54 @@
 </template>
 
 <script>
+// @ is an alias to /src
+import HeaderComponent from "../components/main/HeaderComponent";
+import { productFeatures, productPlans } from "../api/Product";
 // Import component
 import Loading from "vue-loading-overlay";
 // Import stylesheet
 import "vue-loading-overlay/dist/vue-loading.css";
 
 export default {
-  name: "TableComponent",
-  components: { Loading },
-  props: ["title", "enableParent", "plan", "features"],
+  name: "Home",
+  components: {
+    HeaderComponent,
+    Loading
+  },
   data() {
     return {
-      isLoading: false
+      title: "Main User License Plans",
+      description:
+        "Explore our user licenses plans for SwiftAssess, which includes a variety of features to help you achieve more",
+      img: "header-img1.png",
+      typeId: "",
+      isLoading: false,
+      plans: [],
+      features: []
     };
+  },
+  mounted() {
+    let uri = window.location.search.substring(1);
+    let params = new URLSearchParams(uri);
+    this.typeId = params.get("type");
+    console.log(this.typeId);
+    this.getData();
+  },
+  methods: {
+    async getData() {
+      this.isLoading = true;
+      let plans = await productPlans.get();
+      this.features = await productFeatures.get(this.typeId);
+      plans.forEach(plan => {
+        if (plan.Product_Type.ID === this.typeId) {
+          this.plans.push(plan);
+        }
+      });
+      this.isLoading = false;
+    }
   }
 };
 </script>
-
 <style scoped lang="scss">
 .row {
   @include display-flex(row, space-between, center, nowrap);

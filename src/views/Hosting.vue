@@ -44,7 +44,7 @@
 import HeaderComponent from "../components/main/HeaderComponent";
 import HostingCard from "../components/main/HostingCard";
 export default {
-  name: "Home",
+  name: "Hosting",
   components: {
     HeaderComponent,
     HostingCard
